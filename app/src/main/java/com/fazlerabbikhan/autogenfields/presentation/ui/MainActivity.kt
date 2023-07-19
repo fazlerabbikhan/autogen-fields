@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.fazlerabbikhan.autogenfields.R
+import com.fazlerabbikhan.autogenfields.data.remote.user_detail_dto.UserDetailDto
 import com.fazlerabbikhan.autogenfields.domain.repository.UserRepository
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var presenter: DynamicFieldsPresenter
     @Inject
     lateinit var userRepository: UserRepository
+    private var userId: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,8 +34,8 @@ class MainActivity : AppCompatActivity() {
         // Fetch the user data asynchronously
         lifecycleScope.launch {
             try {
-                val userData = userRepository.getUserData(1)
-                Log.d("userData", "$userData")
+                val userData = userRepository.getUserData(userId)
+                Log.d("UserData", "$userData")
                 presenter.generateFields(userData, this@MainActivity, containerLayout)
             } catch (e: Exception) {
                 // Handle the error case
@@ -44,6 +46,9 @@ class MainActivity : AppCompatActivity() {
         btnSubmit.setOnClickListener {
             val fieldValues = getFieldValues(containerLayout)
             Log.d("FieldValues", fieldValues.toString())
+
+            val updatedUserDetailDto = createUserDetailDto(fieldValues)
+            updateUserData(updatedUserDetailDto)
         }
     }
 
@@ -56,6 +61,23 @@ class MainActivity : AppCompatActivity() {
             fieldValues.add(fieldValue)
         }
         return fieldValues
+    }
+
+    private fun createUserDetailDto(fieldValues: List<String>): UserDetailDto {
+        val (name, username, email, phone, address) = fieldValues
+        return UserDetailDto(address = address, email = email, id = userId, name = name, outCode = "", outMessage = "", phone = phone, username = username)
+    }
+
+    private fun updateUserData(userDetailDto: UserDetailDto) {
+        lifecycleScope.launch {
+            try {
+                val updatedUserData = userRepository.updateUserData(userId, userDetailDto)
+                Log.d("UpdatedUserData", "$updatedUserData")
+                // Handle success case
+            } catch (e: Exception) {
+                // Handle error case
+            }
+        }
     }
 }
 
