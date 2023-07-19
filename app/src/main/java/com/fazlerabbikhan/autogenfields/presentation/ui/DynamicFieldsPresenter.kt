@@ -1,5 +1,6 @@
 package com.fazlerabbikhan.autogenfields.presentation.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.LinearLayout
@@ -10,6 +11,7 @@ import com.google.android.material.textfield.TextInputLayout
 
 class DynamicFieldsPresenter {
 
+    @SuppressLint("InflateParams")
     fun generateFields(userDetailData: UserDetailDto, context: Context, containerLayout: LinearLayout) {
         val fieldData = mapOf(
             "Name" to userDetailData.name,
@@ -22,7 +24,7 @@ class DynamicFieldsPresenter {
         val inflater = LayoutInflater.from(context)
 
         for ((fieldName, fieldValue) in fieldData) {
-            val inputFieldLayout = inflater.inflate(R.layout.input_field_layout, containerLayout, false)
+            val inputFieldLayout = inflater.inflate(R.layout.input_field_layout, null)
             val textInputLayout = inputFieldLayout.findViewById<TextInputLayout>(R.id.textInputLayout)
             val textInputEditText = inputFieldLayout.findViewById<TextInputEditText>(R.id.textInputEditText)
 
